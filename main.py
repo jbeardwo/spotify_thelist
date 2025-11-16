@@ -1,12 +1,18 @@
 # MAKE A BAND CLASS MAKE A CONCERT CLASS
 # HANDLE WHEN A BAND IS LISTED TWICE
 # Give band class a links attribute to store alt links and handle
-import urllib.request
 import re
+import requests
+
+from band import Band
+from concert import Concert, concert_sort_key
 
 
 def get_followed_bands():
     return [
+        "George Lucas Talk Show",
+        "Gary Numan",
+        "California Honeydrops",
         "Matt Braunger",
         "Thundercat",
         "Karen Less",
@@ -16,42 +22,34 @@ def get_followed_bands():
     ]
 
 
-def get_followed_concerts(followed_bands):
-    list_bands_to_links = get_list_bands()
-
-    for band in followed_bands:
-        if band in list_bands_to_links:
-            band_concerts = get_band_concerts(band, list_bands_to_links)
+def init_followed_concerts(followed_band_names, list_bands_by_name):
+    followed_bands = []
+    for followed_band_name in followed_band_names:
+        if followed_band_name in list_bands_by_name:
+            list_bands_by_name[followed_band_name].init_concerts()
+            followed_bands.append(list_bands_by_name[followed_band_name])
+    return followed_bands
 
 
 def get_list_bands():
-    with urllib.request.urlopen("http://www.foopee.com/punk/the-list/") as response:
-        main_page = response.read().decode("utf-8")
-        # THINK about this: sometimes the same band is listed twice, and you'll get multiple responses from this:
-        # you need to take into account both of them since they may have different concerts
-        # could even be on a different page!
+    main_page = requests.get("http://www.foopee.com/punk/the-list/").text
+
     list_bands_chunk = re.findall(
         r"Concerts By Band</B><DD>\n(.*?)<P><DT><B>Concerts By Venue", main_page
     )[0]
-    list_bands = re.findall(r'<A HREF="([^"]+)">([^<]+)</A>', list_bands_chunk)
-    band_to_link = {}
-    for link, band in list_bands:
-        band_to_link[band] = "http://www.foopee.com/punk/the-list/" + link
-    return band_to_link
+    list_bands_raw = re.findall(r'<A HREF="([^"]+)">([^<]+)</A>', list_bands_chunk)
+    list_bands_by_name = {}
+    for link, band_name in list_bands_raw:
+        link = "http://www.foopee.com/punk/the-list/" + link
+        # We do this because I've seen them have a band listed twice before
+        # Although rare it's likely possible for them to spill over into another page.
+        # This is why we handle links as a set
+        if band_name not in list_bands_by_name:
+            band = Band(band_name)
+            list_bands_by_name[band_name] = band
+        list_bands_by_name[band_name].links.add(link)
 
-
-def get_band_concerts(band, band_to_link):
-    with urllib.request.urlopen(band_to_link[band]) as response:
-        concerts_page = response.read().decode("utf-8")
-
-    concerts_chunk = re.findall(
-        rf"<B>{re.escape(band)}</B></A><UL>\n(.*?)\n</UL>", concerts_page, re.DOTALL
-    )[0]
-
-    concerts_raw = concerts_chunk.split("\n")
-    concerts = []
-    for concert in concerts_raw:
-        concerts.push(process_concert(concert))
+    return list_bands_by_name
 
 
 def process_concert(concert):
@@ -59,8 +57,17 @@ def process_concert(concert):
 
 
 def main():
-    followed_bands = get_followed_bands()
-    followed_concerts = get_followed_concerts(followed_bands)
+    followed_band_names = get_followed_bands()
+    list_bands_by_name = get_list_bands()
+    followed_bands_in_list = init_followed_concerts(
+        followed_band_names, list_bands_by_name
+    )
+    followed_concerts = []
+    for band in followed_bands_in_list:
+        for concert in band.concerts:
+            followed_concerts.append(concert)
+    followed_concerts.sort(key=concert_sort_key)
+    print(followed_concerts)
 
 
 main()

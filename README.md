@@ -12,13 +12,15 @@ to see if there are any shows in the Bay Area for those artists.
 
 ## Instructions
 
-git clone <https://github.com/jbeardwo/spotify_thelistrepo>
-cd spotify_thelist
-make your own .env file using .env.example as a template
-uv sync
-uv run main.py
-You will have to login to your Spotify account and authorize the application.
-You will authenticate automatically for a while after that.
+- git clone <https://github.com/jbeardwo/spotify_thelistrepo>
+- cd spotify_thelist
+- make your own .env file using .env.example as a template
+- uv sync
+- uv run main.py
+- You will have to login to your Spotify account and authorize the application.
+- You will authenticate automatically for a while after that.
 
-I may expand on this later but it does what I want for now.
-I will likely host this eventually.
+### Final Thoughts
+
+- I may expand on this later but it does what I want for now.
+- I will likely host this eventually.

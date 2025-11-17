@@ -12,7 +12,7 @@ to see if there are any shows in the Bay Area for those artists.
 
 ## Instructions
 
-- git clone <https://github.com/jbeardwo/spotify_thelistrepo>
+- git clone <https://github.com/jbeardwo/spotify_thelist>
 - cd spotify_thelist
 - make your own .env file using .env.example as a template
 - uv sync

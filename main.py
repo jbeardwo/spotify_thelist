@@ -6,6 +6,7 @@ import requests
 
 from band import Band
 from concert import Concert, concert_sort_key
+from spotify_actions import get_followed_artists
 
 
 def get_followed_bands():
@@ -52,12 +53,8 @@ def get_list_bands():
     return list_bands_by_name
 
 
-def process_concert(concert):
-    pass
-
-
 def main():
-    followed_band_names = get_followed_bands()
+    followed_band_names = get_followed_artists()
     list_bands_by_name = get_list_bands()
     followed_bands_in_list = init_followed_concerts(
         followed_band_names, list_bands_by_name
@@ -67,7 +64,15 @@ def main():
         for concert in band.concerts:
             followed_concerts.append(concert)
     followed_concerts.sort(key=concert_sort_key)
-    print(followed_concerts)
+    print(
+        "Symbol Key:\n",
+        """   *    recommendable shows			a/a  all ages
+    $    will probably sell out			@    pit warning
+    ^    under 21 must buy drink tickets	#    no ins/outs\n""",
+    )
+    print("Shows in the Bay Area for bands you follow on Spotify:")
+    for followed_concert in followed_concerts:
+        print(followed_concert)
 
 
 main()

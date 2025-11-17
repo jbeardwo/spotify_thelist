@@ -19,6 +19,7 @@ to see if there are any shows in the Bay Area for those artists.
 - uv run main.py
 - You will have to login to your Spotify account and authorize the application.
 - You will authenticate automatically for a while after that.
+- You could also just install the dependencies and run with python main.py
 
 ### Final Thoughts
 
